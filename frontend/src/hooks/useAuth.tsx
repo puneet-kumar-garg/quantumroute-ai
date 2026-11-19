@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { User } from '@/types';
 import { authService } from '@/services/auth.service';
+import { setInitialAuthCheck } from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
@@ -19,10 +20,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setInitialAuthCheck(true);
     authService.getMe()
       .then(setUser)
       .catch(() => setUser(null))
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setInitialAuthCheck(false);
+        setIsLoading(false);
+      });
   }, []);
 
   const login = async (email: string, password: string) => {
