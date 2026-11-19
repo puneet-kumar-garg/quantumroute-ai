@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import uuid
-import bcrypt
+from passlib.context import CryptContext
+_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 from jose import JWTError, jwt
 from fastapi import Cookie, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -13,10 +14,10 @@ from utils.config import settings
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    return _pwd_context.hash(password)
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return bcrypt.checkpw(plain.encode(), hashed.encode())
+    return _pwd_context.verify(plain, hashed)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None, session_id: str | None = None) -> str:
     to_encode = data.copy()
