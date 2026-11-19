@@ -1,5 +1,7 @@
 FROM python:3.12-slim
 
+ARG CACHEBUST=4
+
 WORKDIR /app
 
 COPY backend/requirements.txt .
